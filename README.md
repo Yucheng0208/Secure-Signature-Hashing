@@ -2,7 +2,7 @@
 
 ## Overview
 This project, **Secure Signature Hashing (SSH)**, presents a novel approach to encrypted digital signatures using temporal and spatial data. It consists of two Python scripts:
-- **SSH-Crypto.py**: A GUI-based tool that enables users to input a message and sign it digitally. The signature is captured as a series of coordinates and hashed using SHA-256.
+- **SSH-Crypto.py**: A GUI-based tool enabling users to input and sign a message digitally. The signature is captured as a series of coordinates and hashed using SHA-256.
 - **SSH-Vrfy.py**: A verification tool that loads the generated signature JSON file and reconstructs the signature to verify its authenticity.
 
 ## Features
@@ -72,7 +72,7 @@ The verification process involves:
 ## Future Enhancements
 - Implement public-key cryptography (RSA/ECDSA) for digital signatures.
 - Improve UI/UX with real-time signature smoothing.
-- Add a feature to compare similarity between signatures.
+- Add a feature to compare the similarity between signatures.
 
 ## License
-This project is released under the MIT License.
+This project is released under the [MIT License](LICENSE).

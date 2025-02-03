@@ -61,7 +61,6 @@ The verification process involves:
 
 ## File Structure
 ```
-.
 ├── SSH-Crypto.py     # Signing tool
 ├── SSH-Vrfy.py       # Verification tool
 ├── Signature_Image/  # Stored signature images
@@ -75,7 +74,7 @@ The verification process involves:
 - Add a feature to compare the similarity between signatures.
 
 > [!IMPORTANT]
-> This content was already presented at IEEE in 2025; please await its publication.
+> This content was already presented at the **IEEE Conference 2025**; please await its publication.
 
 ## License
 This project is released under the [MIT License](LICENSE).

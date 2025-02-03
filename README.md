@@ -1,99 +1,81 @@
-# Secure-Signature-Hashing (SSH)
+# Secure Signature Hashing (SSH)
 
 ## Overview
-SigTrack-Encryptor is a Python-based cryptographic system that generates a unique and secure digital signature based on a user's handwritten signature. It uses SHA-256 hashing along with timestamp embedding to ensure security and uniqueness. This system can be applied to digital authentication, contract signing, and secure identity verification.
+This project, **Secure Signature Hashing (SSH)**, presents a novel approach to encrypted digital signatures using temporal and spatial data. It consists of two Python scripts:
+- **SSH-Crypto.py**: A GUI-based tool enabling users to input and sign a message digitally. The signature is captured as a series of coordinates and hashed using SHA-256.
+- **SSH-Vrfy.py**: A verification tool that loads the generated signature JSON file and reconstructs the signature to verify its authenticity.
 
 ## Features
-- Secure digital signature generation using SHA-256
-- Unique hashing based on signature strokes and timestamp
-- Signature verification mechanism
-- Supports Base64 encoding for easy storage and transmission
+- **Graphical Signature Input**: Users can draw a signature on a canvas.
+- **Timestamp-Based Hashing**: The signature is combined with a message and timestamp before hashing.
+- **JSON Storage**: The hashed data and signature coordinates are stored in JSON format.
+- **Signature Verification**: The stored JSON file can be loaded to reconstruct the signature.
 
 ## Installation
-
-Ensure you have Python 3.7+ installed. You can install dependencies using:
-
-```sh
-pip install hashlib json base64 datetime
+### Prerequisites
+Ensure you have Python 3 installed and the required dependencies:
+```bash
+pip install numpy opencv-python PyQt5
 ```
 
-## Usage
+### Running the Application
+#### Step 1: Generate Signature
+Run the signing application:
+```bash
+python SSH-Crypto.py
+```
+1. Enter your message.
+2. Draw your signature.
+3. Click 'Generate Hash & Save JSON'.
+4. The generated JSON file will be stored in `Generated_Hash/`.
 
-### 1. Generate a Signature
-Use `generate_encrypted_signature.py` to create a secure signature hash.
+#### Step 2: Verify Signature
+Run the verification application:
+```bash
+python SSH-Vrfy.py
+```
+1. Click 'Load JSON Signature File'.
+2. Select the JSON file from `Generated_Hash/`.
+3. The signature will be reconstructed and displayed.
 
-```python
-import hashlib
-import json
-import base64
-from datetime import datetime
+## Mathematical Concepts
+### Secure Hash Algorithm (SHA-256)
+A signature is converted into a series of coordinate points $\( (x_i, y_i) \)$ which are serialized into JSON format:
 
-def generate_encrypted_signature(user_id, signature_points):
-    """
-    Generate an encrypted signature using SHA-256.
-    :param user_id: User identifier
-    :param signature_points: Signature stroke data [(x, y, timestamp), ...]
-    :return: Encrypted signature dictionary
-    """
-    signature_str = json.dumps(signature_points, separators=(',', ':'))
-    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    raw_data = f"{user_id}|{timestamp}|{signature_str}"
-    
-    hash_object = hashlib.sha256(raw_data.encode('utf-8'))
-    hash_hex = hash_object.hexdigest()
-    encrypted_signature = base64.b64encode(hash_hex.encode()).decode()
-    
-    return {
-        "UserID": user_id,
-        "Timestamp": timestamp,
-        "Hash": encrypted_signature
-    }
+$H = \text{SHA-256}(\text{JSON}([x_1, y_1], [x_2, y_2], \dots))$
+SHA-256 ensures that even a minor change in the signature results in a completely different hash.
 
-# Example
-user_id = "user_id"
-signature_data = [(10, 20, 1706872330), (30, 40, 1706872331), (50, 60, 1706872332)]
-encrypted_signature = generate_encrypted_signature(user_id, signature_data)
-print(encrypted_signature)
+### Cryptographic Integrity
+Given a message $\( M \)$ and a signature $\( S \)$, the hash is computed as:
+$\[
+H = \text{SHA-256}(M \parallel S \parallel T)
+\]$
+where \( T \) is the timestamp. This ensures that the signature is time-sensitive and resistant to tampering.
+
+### Signature Verification
+The verification process involves:
+1. Loading $\( H \)$ from the JSON file.
+2. Recomputing $\( H' \)$ from the signature points.
+3. If $\( H = H' \)$, the signature is valid.
+
+## File Structure
+```
+├── SSH-Crypto.py     # Signing tool
+├── SSH-Vrfy.py       # Verification tool
+├── Signature_Image/  # Stored signature images
+├── Generated_Hash/   # Stored JSON hash files
+└── README.md         # Documentation
 ```
 
-### 2. Verify a Signature
-Use `verify_signature.py` to check the authenticity of a given signature.
+## Future Enhancements
+- Implement public-key cryptography (RSA/ECDSA) for digital signatures.
+- Improve UI/UX with real-time signature smoothing.
+- Add a feature to compare the similarity between signatures.
 
-```python
-import hashlib
-import json
-import base64
-
-def verify_signature(user_id, signature_points, timestamp, given_signature):
-    """
-    Verify if the given signature is valid.
-    :param user_id: User ID
-    :param signature_points: Signature data [(x, y, timestamp), ...]
-    :param timestamp: Timestamp of signature
-    :param given_signature: Provided encrypted hash
-    :return: True if valid, False otherwise
-    """
-    signature_str = json.dumps(signature_points, separators=(',', ':'))
-    raw_data = f"{user_id}|{timestamp}|{signature_str}"
-    hash_object = hashlib.sha256(raw_data.encode('utf-8'))
-    computed_hash_hex = hash_object.hexdigest()
-    computed_signature = base64.b64encode(computed_hash_hex.encode()).decode()
-    return computed_signature == given_signature
-
-# Example Verification
-is_valid = verify_signature(user_id, signature_data, encrypted_signature["Timestamp"], encrypted_signature["Hash"])
-print("Signature is valid" if is_valid else "Signature is invalid")
-```
-
-## Applications
-- **Digital Contracts**: Secure electronic agreements
-- **Financial Transactions**: Signature-based transaction authentication
-- **Identity Verification**: Secure authentication for online accounts
-- **Logistics & Delivery**: Proof of receipt for shipments
+> [!IMPORTANT]
+> This content was already presented at the **IEEE Conference 2025**; please await its publication.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is released under the [MIT License](LICENSE).
 
----
 
-For contributions, please submit a pull request or report issues in the GitHub repository.

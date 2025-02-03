@@ -5,7 +5,7 @@ import json
 import base64
 import numpy as np
 import cv2
-from datetime import datetime
+from datetime import datetime, timezone
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QLabel, QCheckBox,
     QPushButton, QMenuBar, QAction, QMessageBox
@@ -147,7 +147,7 @@ class SignaturePad(QWidget):
             QMessageBox.warning(self, "Error", "You must provide a signature!")
             return
 
-        timestamp = str(int(datetime.utcnow().timestamp() * 1e6))
+        timestamp = str(int(datetime.now(timezone.utc).timestamp() * 1e6))
         hash_data = {
             "Message": message,
             "Timestamp": timestamp,

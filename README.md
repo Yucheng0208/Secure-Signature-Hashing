@@ -74,5 +74,10 @@ The verification process involves:
 - Improve UI/UX with real-time signature smoothing.
 - Add a feature to compare the similarity between signatures.
 
+> [!IMPORTANT]
+> This content was already presented at IEEE in 2025; please await its publication.
+
 ## License
 This project is released under the [MIT License](LICENSE).
+
+

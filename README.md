@@ -50,7 +50,7 @@ Given a message $\( M \)$ and a signature $\( S \)$, the hash is computed as:
 $\[
 H = \text{SHA-256}(M \parallel S \parallel T)
 \]$
-where \( T \) is the timestamp. This ensures that the signature is time-sensitive and resistant to tampering.
+where $\( T \)$ is the timestamp. This ensures that the signature is time-sensitive and resistant to tampering.
 
 ### Signature Verification
 The verification process involves:

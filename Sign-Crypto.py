@@ -147,7 +147,7 @@ class SignaturePad(QWidget):
             QMessageBox.warning(self, "Error", "You must provide a signature!")
             return
 
-        timestamp = str(int(datetime.timestamp() * 1e6))
+        timestamp = str(int(datetime.utcnow().timestamp() * 1e6))
         hash_data = {
             "Message": message,
             "Timestamp": timestamp,

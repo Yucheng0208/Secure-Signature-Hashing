@@ -40,24 +40,23 @@ python SSH-Vrfy.py
 
 ## Mathematical Concepts
 ### Secure Hash Algorithm (SHA-256)
-A signature is converted into a series of coordinate points \( (x_i, y_i) \) which are serialized into JSON format:
-\[
-H = \text{SHA-256}(\text{JSON}([x_1, y_1], [x_2, y_2], \dots))
-\]
+A signature is converted into a series of coordinate points $\( (x_i, y_i) \)$ which are serialized into JSON format:
+
+$H = \text{SHA-256}(\text{JSON}([x_1, y_1], [x_2, y_2], \dots))$
 SHA-256 ensures that even a minor change in the signature results in a completely different hash.
 
 ### Cryptographic Integrity
-Given a message \( M \) and a signature \( S \), the hash is computed as:
-\[
+Given a message $\( M \)$ and a signature $\( S \)$, the hash is computed as:
+$\[
 H = \text{SHA-256}(M \parallel S \parallel T)
-\]
+\]$
 where \( T \) is the timestamp. This ensures that the signature is time-sensitive and resistant to tampering.
 
 ### Signature Verification
 The verification process involves:
-1. Loading \( H \) from the JSON file.
-2. Recomputing \( H' \) from the signature points.
-3. If \( H = H' \), the signature is valid.
+1. Loading $\( H \)$ from the JSON file.
+2. Recomputing $\( H' \)$ from the signature points.
+3. If $\( H = H' \)$, the signature is valid.
 
 ## File Structure
 ```

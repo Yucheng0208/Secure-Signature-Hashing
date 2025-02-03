@@ -10,20 +10,19 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QLabel, QCheckBox, QComboBox,
     QPushButton, QMenuBar, QAction, QMessageBox
 )
-from PyQt5.QtGui import QPainter, QPen, QPixmap
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtGui import QPainter, QPen, QPixmap, QIcon
+from PyQt5.QtCore import Qt, QPoint, QTimer
 
 
 class SignaturePad(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Message & Signature Hasher")
-        self.setFixedSize(850, 800)
+        self.setMinimumSize(850, 850)  # 設定最小視窗大小
+        self.setWindowIcon(QIcon("icon.png"))
 
         # 畫布設定
-        self.canvas_width = self.width() - 50
-        self.canvas_height = 400
-        self.canvas = QPixmap(self.canvas_width, self.canvas_height)
+        self.canvas = QPixmap(800, 400)  # 初始畫布大小
         self.canvas.fill(Qt.white)
         self.signature_points = []
 
@@ -32,22 +31,22 @@ class SignaturePad(QWidget):
 
         # 設定功能表列
         menu_bar = QMenuBar(self)
-        file_menu = menu_bar.addMenu("檔案(F)")
-        edit_menu = menu_bar.addMenu("編輯(E)")
-        help_menu = menu_bar.addMenu("說明(H)")
+        file_menu = menu_bar.addMenu("File(F)")
+        edit_menu = menu_bar.addMenu("Edit(E)")
+        help_menu = menu_bar.addMenu("Help(H)")
 
         # 檔案選項
-        exit_action = QAction("退出", self)
+        exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
         # 編輯選項
-        clear_action = QAction("清除畫布", self)
+        clear_action = QAction("Clear", self)
         clear_action.triggered.connect(self.clear_signature)
         edit_menu.addAction(clear_action)
 
         # 說明選項
-        about_action = QAction("關於", self)
+        about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about_info)
         help_menu.addAction(about_action)
 
@@ -56,6 +55,7 @@ class SignaturePad(QWidget):
         self.message_input.setPlaceholderText("Enter your message here...")
 
         self.mouse_position_label = QLabel("Mouse Position: (0, 0)", self)
+        self.current_time_label = QLabel("Time: " + self.get_current_time(), self)
 
         self.clear_button = QPushButton("Clear Signature", self)
         self.clear_button.clicked.connect(self.clear_signature)
@@ -75,6 +75,11 @@ class SignaturePad(QWidget):
         self.hash_format_combo.addItems(["JSON", "CSV", "TXT"])
         self.hash_format_combo.setCurrentIndex(0)
 
+        # 設定計時器，用於更新時間
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(1000)
+
         # 畫布顯示 Label
         self.canvas_label = QLabel(self)
         self.canvas_label.setPixmap(self.canvas)
@@ -85,6 +90,7 @@ class SignaturePad(QWidget):
         layout.addWidget(QLabel("Message:"))
         layout.addWidget(self.message_input)
         layout.addWidget(self.mouse_position_label)
+        layout.addWidget(self.current_time_label)
         layout.addWidget(self.label_sign)
         layout.addWidget(self.canvas_label)
         layout.addWidget(self.remove_background_checkbox)
@@ -103,6 +109,14 @@ class SignaturePad(QWidget):
         os.makedirs("Signature_Image", exist_ok=True)
         os.makedirs("Generated_Hash", exist_ok=True)
 
+    def get_current_time(self):
+        """ 取得當前時間，格式為 YYYY-MM-DD HH:MM:SS (24 小時制) """
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def update_time(self):
+        """ 每秒更新時間顯示 """
+        self.current_time_label.setText("Time: " + self.get_current_time())
+
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and self.canvas_label.geometry().contains(event.pos()):
             self.drawing = True
@@ -113,7 +127,7 @@ class SignaturePad(QWidget):
     def mouseMoveEvent(self, event):
         if self.canvas_label.geometry().contains(event.pos()):
             canvas_x = event.x() - self.canvas_label.x()
-            canvas_y = self.canvas_height - (event.y() - self.canvas_label.y())
+            canvas_y = self.canvas.height() - (event.y() - self.canvas_label.y())
             self.mouse_position_label.setText(f"Mouse Position: ({canvas_x}, {canvas_y})")
 
         if self.drawing and event.buttons() & Qt.LeftButton:
@@ -135,6 +149,15 @@ class SignaturePad(QWidget):
         self.signature_points = []
         self.canvas_label.setPixmap(self.canvas)
 
+    def resizeEvent(self, event):
+        """ 視窗大小改變時動態調整畫布 """
+        new_width = self.width() - 50
+        new_height = self.height() - 450
+        self.canvas = QPixmap(new_width, new_height)
+        self.canvas.fill(Qt.white)
+        self.canvas_label.setPixmap(self.canvas)
+        super().resizeEvent(event)
+
     def show_about_info(self):
         QMessageBox.information(self, "About", "This is a signature hashing application.")
 
@@ -146,8 +169,8 @@ class SignaturePad(QWidget):
 
     def save_signature_image(self, filename):
         image = self.canvas.toImage()
-        buffer = image.bits().asarray(self.canvas_width * self.canvas_height * 4)
-        img_array = np.array(buffer, dtype=np.uint8).reshape((self.canvas_height, self.canvas_width, 4))
+        buffer = image.bits().asarray(self.canvas.width() * self.canvas.height() * 4)
+        img_array = np.array(buffer, dtype=np.uint8).reshape((self.canvas.height(), self.canvas.width(), 4))
 
         if self.remove_background_checkbox.isChecked():
             img_array = cv2.cvtColor(img_array, cv2.COLOR_BGRA2BGR)
@@ -194,7 +217,7 @@ class SignaturePad(QWidget):
         self.save_signature_image(image_file_name)
 
         self.signature_display.setText(json.dumps(hash_data, indent=4))
-        QMessageBox.information(self, "Success", f"Hash and Signature saved as {file_format}!")
+        QMessageBox.information(self, "Success", f"Your signature has been saved, and the hash and signature have been stored in {file_format} format.")
 
     def closeEvent(self, event):
         """ 確認是否關閉視窗 """
@@ -210,6 +233,7 @@ class SignaturePad(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("icon.png"))
     window = SignaturePad()
     window.show()
     sys.exit(app.exec_())
